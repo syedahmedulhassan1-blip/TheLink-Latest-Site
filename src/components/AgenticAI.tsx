@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Bot, Building2, ShoppingCart, Truck, TrendingUp, Stethoscope, DollarSign, Zap, ArrowRight, Cpu, Activity, Globe as Globe2 } from 'lucide-react';
 import { useRouter } from '../router';
+import { useContent } from '../content/ContentContext';
+import SmartImage from './SmartImage';
 
 function useReveal(threshold = 0.08) {
   const ref = useRef<HTMLDivElement>(null);
@@ -124,6 +126,8 @@ const deployments: Deployment[] = [
 
 const AgenticAI: React.FC = () => {
   const { navigate } = useRouter();
+  const { content } = useContent();
+  const underHood = content.agenticAI?.underHoodImage;
   const heading = useReveal();
   const poweredBy = useReveal(0.1);
   const grid = useReveal(0.04);
@@ -200,6 +204,20 @@ const AgenticAI: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Full-bleed image under "Under The Hood" — breaks out of the max-w
+            container to span the full viewport width. Hidden until set in CMS. */}
+        {underHood?.src ? (
+          <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen my-20">
+            <SmartImage
+              src={underHood.src}
+              alt={underHood.alt || ''}
+              className="w-full h-auto block"
+            />
+            {/* subtle edge fade to blend with the black page */}
+            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 12%, transparent 88%, rgba(0,0,0,0.4) 100%)' }} />
+          </div>
+        ) : null}
 
         {/* Deployments grid */}
         <p className={`text-center text-gray-500 text-sm tracking-widest uppercase font-light mb-10 transition-all duration-700 ${grid.visible ? 'opacity-100' : 'opacity-0'}`}>
