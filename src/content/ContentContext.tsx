@@ -48,9 +48,10 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
           branding: stored.branding ?? defaultContent.branding,
           hero: stored.hero ?? defaultContent.hero,
           slideshow: stored.slideshow ?? defaultContent.slideshow,
-          about: stored.about ?? defaultContent.about,
+          about: { ...defaultContent.about, ...(stored.about ?? {}) },
           showreel: stored.showreel ?? defaultContent.showreel,
           multilingual: stored.multilingual ?? defaultContent.multilingual,
+          agenticAI: stored.agenticAI ?? defaultContent.agenticAI,
           portfolio: stored.portfolio ?? defaultContent.portfolio,
         });
       } else {
