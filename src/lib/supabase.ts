@@ -29,3 +29,33 @@ export async function getSupabase(): Promise<SupabaseClient | null> {
 export const CONTENT_TABLE = 'site_content';
 export const CONTENT_ROW_ID = 1;
 export const STORAGE_BUCKET = 'media';
+export const SETTINGS_TABLE = 'admin_settings';
+export const SETTINGS_ROW_ID = 1;
+
+/**
+ * Verify the admin password against the value stored in Supabase.
+ * Falls back to the VITE_ADMIN_PASSWORD env var if Supabase isn't reachable,
+ * and to the built-in default only if neither is available.
+ */
+export async function verifyAdminPassword(input: string): Promise<boolean> {
+  const envPassword = import.meta.env.VITE_ADMIN_PASSWORD as string | undefined;
+
+  const supabase = await getSupabase();
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from(SETTINGS_TABLE)
+        .select('admin_password')
+        .eq('id', SETTINGS_ROW_ID)
+        .maybeSingle();
+      if (!error && data?.admin_password != null) {
+        return input === data.admin_password;
+      }
+    } catch {
+      // fall through to env / default
+    }
+  }
+
+  if (envPassword) return input === envPassword;
+  return input === 'thelink-admin';
+}
