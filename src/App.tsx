@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
@@ -12,7 +13,28 @@ import {
   ContactPage,
 } from './pages';
 
+// Admin is code-split so it never weighs down the public site bundle.
+const AdminPage = lazy(() => import('./admin/AdminPage'));
+
 function App() {
+  return (
+    <Routes>
+      {/* Standalone admin — no public header/footer */}
+      <Route
+        path="/admin"
+        element={
+          <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+            <AdminPage />
+          </Suspense>
+        }
+      />
+      {/* Public site */}
+      <Route path="*" element={<SiteShell />} />
+    </Routes>
+  );
+}
+
+function SiteShell() {
   return (
     <div className="min-h-screen bg-black flex flex-col">
       <ScrollToTop />

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowRight, X, ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
+import { useContent } from '../content/ContentContext';
+import SmartImage from './SmartImage';
 
 interface PortfolioItem {
   id: number;
@@ -74,7 +76,7 @@ const Lightbox: React.FC<LightboxProps> = ({ item, onClose }) => {
         {/* Image area */}
         <div className="relative bg-gray-950 rounded-2xl overflow-hidden flex items-center justify-center" style={{ minHeight: '60vh' }}>
           {item.images.map((img, i) => (
-            <img
+            <SmartImage
               key={i}
               src={img}
               alt={`${item.title} ${i + 1}`}
@@ -180,7 +182,7 @@ const PortfolioCard: React.FC<{ item: PortfolioItem; delay: number; visible: boo
             key={i}
             className={`absolute inset-0 transition-opacity duration-1000 ${i === imgIdx ? 'opacity-100' : 'opacity-0'}`}
           >
-            <img
+            <SmartImage
               src={img}
               alt={`${item.title} ${i + 1}`}
               className={`w-full h-full object-cover transition-transform duration-[1.2s] ${hovered ? 'scale-105' : 'scale-100'}`}
@@ -232,13 +234,9 @@ const PortfolioCard: React.FC<{ item: PortfolioItem; delay: number; visible: boo
 };
 
 // ── Video Hero ────────────────────────────────────────────
-const showreelVideos = [
-  { src: '/videos/showreel-1.mp4', label: 'Showreel 01' },
-  { src: '/videos/showreel-2.mp4', label: 'Showreel 02' },
-  { src: '/videos/showreel-3.mp4', label: 'Showreel 03' },
-];
 
-const VideoHero: React.FC = () => {
+const VideoHero: React.FC<{ videos: { src: string; label: string }[] }> = ({ videos }) => {
+  const showreelVideos = videos;
   const [current, setCurrent] = useState(0);
   const [muted, setMuted] = useState(true);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -262,6 +260,26 @@ const VideoHero: React.FC = () => {
   useEffect(() => {
     videoRefs.current.forEach((v, i) => { if (v) v.muted = muted; if (i === current && v) v.play().catch(() => {}); });
   }, [muted, current]);
+
+  // No videos yet → show a branded static "Our Work" hero instead of a broken
+  // black video area. This keeps the page polished until footage is uploaded.
+  if (showreelVideos.length === 0) {
+    return (
+      <div className="relative w-full bg-black overflow-hidden flex items-center justify-center" style={{ height: '60vh', minHeight: '380px' }}>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-green-500/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-8 left-1/2 -translate-x-1/2 flex items-center gap-3">
+          <div className="w-8 h-px bg-green-400/60" />
+          <span className="text-green-400/80 text-xs tracking-[0.4em] uppercase font-light">Our Showreel</span>
+          <div className="w-8 h-px bg-green-400/60" />
+        </div>
+        <div className="text-center relative z-10">
+          <h2 className="text-white text-6xl md:text-8xl font-extralight tracking-tight leading-none">
+            Our <span className="italic text-green-400">Work</span>
+          </h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full bg-black overflow-hidden" style={{ height: '100vh', maxHeight: '900px', minHeight: '500px' }}>
@@ -340,34 +358,42 @@ const VideoHero: React.FC = () => {
 };
 
 // ── Data ─────────────────────────────────────────────────
-const portfolioItems: PortfolioItem[] = [
-  { id: 12, title: 'Red Bull "Crazier Than Reality" Campaign', client: 'Red Bull', category: 'creative', featured: true, images: ['/Redbull Campaign/Redbull1.png', '/Redbull Campaign/Redbull2.png', '/Redbull Campaign/Redbull3.png', '/Redbull Campaign/Redbull4.png', '/Redbull Campaign/Redbull5.png'], description: '"If you see something crazier than reality, it\'s either AI or Red Bull." A globally featured campaign pairing jaw-dropping extreme sports photography with the brand\'s iconic irreverence.' },
-  { id: 8,  title: 'Volkswagen Precision Campaign', client: 'Volkswagen', category: 'print', featured: true, images: ['/Wolkswagon Precision Campaign/1.png', '/Wolkswagon Precision Campaign/2.png', '/Wolkswagon Precision Campaign/3.png'], description: "A precision-led print campaign placing the VW badge against the world's most enduring structures, the Parthenon, the Great Pyramid, and Incan stonework, to communicate engineering that stands the test of time." },
-  { id: 7,  title: 'AlBaik Saudi Founding Day Campaign', client: 'AlBaik', category: 'creative', featured: true, images: ['/Super Crisp with the name of AlBaik Campaign/Untitled-1.png', '/Super Crisp with the name of AlBaik Campaign/Untitled-1_copy.png', '/Super Crisp with the name of AlBaik Campaign/Book.png', '/Super Crisp with the name of AlBaik Campaign/horse.png', '/Super Crisp with the name of AlBaik Campaign/shop.png'], description: 'AlBaik Saudi Founding Day campaign featuring outdoor murals, heritage street placements, and bold cultural visual identity.' },
-  { id: 1,  title: 'Almarai Saudi National Day Campaign', client: 'Almarai', category: 'creative', featured: true, images: ['/Almarai Saudi National Day Campaign/1.webp', '/Almarai Saudi National Day Campaign/2.webp', '/Almarai Saudi National Day Campaign/3.webp', '/Almarai Saudi National Day Campaign/4.webp', '/Almarai Saudi National Day Campaign/5.webp'], description: 'Saudi National Day campaign featuring traditional cultural elements, heritage murals, and Times Square billboard.' },
-  { id: 2,  title: 'Super Crisp Mixed Campaigns', client: 'Super Crisp', category: 'creative', images: ['/Super Crisp Mixed Campaigns/1.webp', '/Super Crisp Mixed Campaigns/2.webp', '/Super Crisp Mixed Campaigns/3.webp', '/Super Crisp Mixed Campaigns/4.webp'], description: 'Multi-campaign portfolio including cricket sports marketing, seasonal celebrations, and 43-year anniversary.' },
-  { id: 3,  title: 'Volvo Electric Vehicle Launch', client: 'Volvo, Saudi Arabia and Russia', category: 'creative', images: ['/1.webp', '/2.webp', '/3.webp', '/4.webp', '/5.webp', '/russian.png', '/russian copy.png'], description: 'Multi-market EV launch campaign for Saudi Arabia and Russia with dramatic cityscape billboard executions.' },
-  { id: 4,  title: 'Emirates Comfort Campaign', client: 'Emirates Airlines', category: 'creative', images: ['/Gemini_Generated_Image_ixm98sixm98sixm9 copy copy copy.png', '/Gemini_Generated_Image_ixm98sixm98sixm9 copy copy.png', '/Gemini_Generated_Image_ixm98sixm98sixm9 copy.png', '/Gemini_Generated_Image_ixm98sixm98sixm9.png'], description: 'German market airline comfort campaign showcasing premium travel experience.' },
-  { id: 5,  title: 'Petromin Autocare Campaigns', client: 'Petromin Autocare', category: 'creative', images: ['/Toyota Brake Pads Campaign/1.webp', '/Toyota Brake Pads Campaign/2.webp', '/Toyota Brake Pads Campaign/3.webp', '/Toyota Brake Pads Campaign/4.webp', '/Toyota Brake Pads Campaign/5.webp'], description: 'Multilingual automotive service campaigns for Arabic and English markets featuring Toyota repair services.' },
-  { id: 6,  title: 'Automotive Campaign', client: 'Yousuf Naghi Motors', category: 'creative', images: ['/Automotive Campaign/1.png', '/Automotive Campaign/2.png', '/Automotive Campaign/Final.png', '/Automotive Campaign/Final_Arabic.png'], description: 'Complete brand campaign for automotive market entry.' },
-  { id: 10, title: 'Jaguar Rebrand Campaign', client: 'Jaguar', category: 'creative', images: ['/Jaguar Campaign/kv.png', '/Jaguar Campaign/kv_2.png', '/Jaguar Campaign/Kv_3.png', '/Jaguar Campaign/helmet.png', '/Jaguar Campaign/helmetw3.png', '/Jaguar Campaign/bag.png', '/Jaguar Campaign/Comparison.png', '/Jaguar Campaign/Improved_logo.png', '/Jaguar Campaign/Jaguar_logo.png', '/Jaguar Campaign/Label.png', '/Jaguar Campaign/logo_2.png'], description: 'Comprehensive Jaguar rebrand concept with custom logo redesign, electric vehicle campaign visuals, branded merchandise mockups including helmets and bags, and futuristic key visual compositions.' },
-  { id: 9,  title: 'Intel Inside Campaign', client: 'Intel', category: 'creative', images: ['/Intel Campaign/1.png', '/Intel Campaign/2.png', '/Intel Campaign/3.png', '/Intel Campaign/4.png'], description: 'Humorous "Without Intel Inside" concept campaign revealing the human effort hidden behind everyday smart machines: ATMs, vending machines, recycling kiosks, and coffee dispensers.' },
-  { id: 11, title: 'JazzCash Brand Campaign', client: 'JazzCash', category: 'creative', images: ['/Jazz Cash Campaign/Accessibility.png', '/Jazz Cash Campaign/Arrow.png', '/Jazz Cash Campaign/Bag.png', '/Jazz Cash Campaign/Cash_Flow.png', '/Jazz Cash Campaign/Convenience.png', '/Jazz Cash Campaign/Credit_Card.png', '/Jazz Cash Campaign/Envelope.png', '/Jazz Cash Campaign/innovation.png', '/Jazz Cash Campaign/Letter_C_and_J.png', '/Jazz Cash Campaign/Logo.png', '/Jazz Cash Campaign/Mockup.png', '/Jazz Cash Campaign/Post_1.png', '/Jazz Cash Campaign/Post_design_white.png', '/Jazz Cash Campaign/Shirt.png'], description: 'Full brand identity and campaign for JazzCash, including logo design, social media posts, OOH mockups, and branded merchandise such as T-shirts, tote bags, credit cards, and envelope stationery.' },
-];
+// Portfolio data now comes from the CMS (content store). See Portfolio below.
 
-const filters = [
+// ── Page ─────────────────────────────────────────────────
+const allFilters = [
   { id: 'all',      label: 'All Work' },
   { id: 'creative', label: 'Creative' },
   { id: 'print',    label: 'Print' },
   { id: 'pos',      label: 'POS' },
 ];
 
-// ── Page ─────────────────────────────────────────────────
 const Portfolio: React.FC = () => {
+  const { content } = useContent();
   const [active, setActive] = useState('all');
   const [lightbox, setLightbox] = useState<PortfolioItem | null>(null);
   const heading = useReveal();
   const grid = useReveal(0.04);
+
+  // Map CMS content → the shape the cards/lightbox already expect.
+  const portfolioItems: PortfolioItem[] = content.portfolio.map((c) => ({
+    id: c.id,
+    title: c.title,
+    client: c.client,
+    category: c.category,
+    description: c.description,
+    featured: c.featured,
+    images: c.images.map((m) => m.src).filter(Boolean),
+  }));
+
+  // Showreel videos from CMS (empty entries removed). VideoHero handles empty.
+  const showreelVideos = content.showreel.videos
+    .filter((v) => v.src)
+    .map((v, i) => ({ src: v.src, label: v.alt || `Showreel ${String(i + 1).padStart(2, '0')}` }));
+
+  // Only show category filters that actually have work, so no empty grids.
+  const presentCategories = new Set(portfolioItems.map((i) => i.category));
+  const filters = allFilters.filter((f) => f.id === 'all' || presentCategories.has(f.id));
 
   const filtered = active === 'all' ? portfolioItems : portfolioItems.filter(i => i.category === active);
 
@@ -376,7 +402,7 @@ const Portfolio: React.FC = () => {
       {lightbox && <Lightbox item={lightbox} onClose={() => setLightbox(null)} />}
 
       {/* Full-bleed video showreel */}
-      <VideoHero />
+      <VideoHero videos={showreelVideos} />
 
       <div className="py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 

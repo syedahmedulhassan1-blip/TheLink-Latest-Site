@@ -1,6 +1,8 @@
 import React from 'react';
 import { Phone, Mail, MapPin, Linkedin, Globe, ArrowRight } from 'lucide-react';
 import { useRouter, type Page } from '../router';
+import { useContent } from '../content/ContentContext';
+import SmartImage from './SmartImage';
 
 const navLinks: { label: string; id: Page }[] = [
   { label: 'Home',          id: 'home' },
@@ -14,6 +16,7 @@ const navLinks: { label: string; id: Page }[] = [
 
 const Footer: React.FC = () => {
   const { navigate } = useRouter();
+  const { content } = useContent();
 
   return (
     <footer className="bg-black text-white border-t border-white/5">
@@ -22,7 +25,7 @@ const Footer: React.FC = () => {
 
           {/* Brand */}
           <div className="lg:col-span-5">
-            <img src="/the link logo white.png" alt="The Link Advertising" className="h-12 w-auto mb-6" />
+            <SmartImage src={content.branding.logoLight.src} alt={content.branding.logoLight.alt || 'The Link Advertising'} className="h-12 w-auto mb-6" />
             <p className="text-gray-500 mb-8 max-w-sm leading-relaxed font-light text-sm">
               A creative and technology agency spanning 4 sub-continents, rooted in the Middle East &amp; Saudi Arabia.
               We build brands that captivate and autonomous systems that perform.

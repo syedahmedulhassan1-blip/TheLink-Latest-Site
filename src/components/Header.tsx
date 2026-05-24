@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useRouter, type Page } from '../router';
+import { useContent } from '../content/ContentContext';
+import SmartImage from './SmartImage';
 
 interface NavItem { label: string; id: Page }
 
@@ -16,6 +18,7 @@ const navItems: NavItem[] = [
 
 const Header: React.FC = () => {
   const { page, navigate } = useRouter();
+  const { content } = useContent();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -46,9 +49,10 @@ const Header: React.FC = () => {
 
           {/* Logo */}
           <button onClick={() => go('home')} className="flex-shrink-0 group">
-            <img
-              src={darkBg ? '/the link logo white.png' : '/The Link logo.png'}
-              alt="The Link Advertising"
+            <SmartImage
+              src={darkBg ? content.branding.logoLight.src : content.branding.logoDark.src}
+              alt={content.branding.logoDark.alt || 'The Link Advertising'}
+              variant={darkBg ? 'dark' : 'light'}
               className="h-10 md:h-12 w-auto transition-all duration-500 group-hover:scale-105"
             />
           </button>

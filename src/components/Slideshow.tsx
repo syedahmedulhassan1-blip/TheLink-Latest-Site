@@ -1,18 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
-
-const slides = [
-  '/slideshow/1.webp',
-  '/slideshow/2.webp',
-  '/slideshow/4.webp',
-  '/slideshow/5.webp',
-  '/slideshow/8.webp',
-];
+import { useContent } from '../content/ContentContext';
+import SmartImage from './SmartImage';
 
 export default function Slideshow() {
+  const { content } = useContent();
+  // Pull slides from CMS; ignore any empty entries so blanks never show.
+  const slides = content.slideshow.images.filter((s) => s.src).map((s) => s.src);
+
   const [current, setCurrent] = useState(0);
   const [prev, setPrev] = useState<number | null>(null);
   const [animating, setAnimating] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const goTo = (index: number) => {
     if (animating || index === current) return;
@@ -26,8 +24,9 @@ export default function Slideshow() {
   };
 
   useEffect(() => {
+    if (slides.length <= 1) return;
     timerRef.current = setInterval(() => {
-      setCurrent(c => {
+      setCurrent((c) => {
         const next = (c + 1) % slides.length;
         setPrev(c);
         setAnimating(true);
@@ -39,13 +38,18 @@ export default function Slideshow() {
       });
     }, 4000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, []);
+  }, [slides.length]);
+
+  // Nothing to show → render a branded dark band rather than an empty/broken area.
+  if (slides.length === 0) {
+    return <section className="w-full bg-gray-900" style={{ height: '90vh' }} aria-hidden="true" />;
+  }
 
   return (
     <section className="relative w-full overflow-hidden" style={{ height: '90vh' }}>
       {slides.map((src, i) => (
         <div
-          key={src}
+          key={src + i}
           className="absolute inset-0 transition-opacity"
           style={{
             opacity: i === current ? 1 : 0,
@@ -53,7 +57,7 @@ export default function Slideshow() {
             zIndex: i === current ? 2 : i === prev ? 1 : 0,
           }}
         >
-          <img
+          <SmartImage
             src={src}
             alt=""
             className="w-full h-full object-cover"

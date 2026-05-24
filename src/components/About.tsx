@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Globe, Users, Trophy, Target, ArrowRight } from 'lucide-react';
 import { useRouter } from '../router';
+import { useContent } from '../content/ContentContext';
+import SmartImage from './SmartImage';
 
 function useReveal() {
   const ref = useRef<HTMLDivElement>(null);
@@ -24,6 +26,7 @@ const stat = [
 
 const About: React.FC = () => {
   const { navigate } = useRouter();
+  const { content } = useContent();
   const hero = useReveal();
   const grid = useReveal();
   const stats = useReveal();
@@ -117,9 +120,9 @@ const About: React.FC = () => {
             <div className="relative flex items-end justify-center md:justify-start order-2 md:order-1 pt-16 md:pt-0">
               {/* Subtle floor shadow so figure has ground */}
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-black/40 blur-2xl rounded-full" />
-              <img
-                src="/image.png"
-                alt="Syed Ahmed Ul Hassan, CEO and Global Tech and Creative Head"
+              <SmartImage
+                src={content.about.ceoPhoto.src}
+                alt={content.about.ceoPhoto.alt || 'CEO'}
                 className="relative z-10 w-full max-w-sm md:max-w-none md:w-auto md:h-full object-contain object-bottom"
                 style={{ maxHeight: '680px' }}
               />

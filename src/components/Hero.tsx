@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowDown, Play } from 'lucide-react';
 import { useRouter } from '../router';
+import { useContent } from '../content/ContentContext';
+import SmartImage from './SmartImage';
 
 const Hero: React.FC = () => {
   const { navigate } = useRouter();
+  const { content } = useContent();
   const [loaded, setLoaded] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
@@ -40,9 +43,9 @@ const Hero: React.FC = () => {
     <section id="home" className="bg-black">
       {/* Hero Image */}
       <div ref={heroRef} className="relative w-full overflow-hidden" style={{ maxHeight: '100vh' }}>
-        <img
-          src="/Untitled-1.png"
-          alt="The Link Advertising"
+        <SmartImage
+          src={content.hero.image.src}
+          alt={content.hero.image.alt || 'The Link Advertising'}
           className="w-full h-auto block animate-zoom-pan"
           style={{
             maxHeight: '100vh',
@@ -69,9 +72,9 @@ const Hero: React.FC = () => {
               transition: 'opacity 1s 0.2s, transform 1s 0.2s',
             }}
           >
-            <img
-              src="/the link logo white.png"
-              alt="The Link Advertising"
+            <SmartImage
+              src={content.branding.logoLight.src}
+              alt={content.branding.logoLight.alt || 'The Link Advertising'}
               className="h-14 md:h-20 w-auto mx-auto mb-12"
             />
           </div>
