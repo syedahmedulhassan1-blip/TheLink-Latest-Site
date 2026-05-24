@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Globe, Languages, Users, Target, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useRouter } from '../router';
+import { useContent } from '../content/ContentContext';
+import SmartImage from './SmartImage';
 
 function useReveal(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
@@ -14,12 +17,6 @@ function useReveal(threshold = 0.1) {
   return { ref, visible };
 }
 
-const campaigns = [
-  { src: '/russian.png',                                                     lang: 'Russian',  title: 'Electric Launch Campaign',    market: 'Russia' },
-  { src: '/Gemini_Generated_Image_ixm98sixm98sixm9 copy copy copy.png',       lang: 'German',   title: 'Emirates Comfort Campaign',   market: 'Germany' },
-  { src: '/Toyota Brakes Arabic copy copy copy copy.png',                     lang: 'Arabic',   title: 'Toyota Brake Pads Campaign',  market: 'Saudi Arabia' },
-];
-
 const pillars = [
   { icon: Globe,     title: 'Global Reach',      desc: '4 Sub-continents coverage' },
   { icon: Languages, title: '10+ Languages',     desc: 'English, Arabic, Urdu, Hindi, German, Russian & more' },
@@ -28,6 +25,9 @@ const pillars = [
 ];
 
 const MultilingualWork: React.FC = () => {
+  const { navigate } = useRouter();
+  const { content } = useContent();
+  const campaigns = content.multilingual.slides;
   const [idx, setIdx] = useState(0);
   const [direction, setDirection] = useState<'left' | 'right'>('right');
   const [animating, setAnimating] = useState(false);
@@ -46,11 +46,14 @@ const MultilingualWork: React.FC = () => {
   };
 
   useEffect(() => {
+    if (campaigns.length <= 1) return;
     const interval = setInterval(() => go('right'), 4500);
     return () => clearInterval(interval);
-  }, [animating]);
+  }, [animating, campaigns.length]);
 
-  const current = campaigns[idx];
+  if (campaigns.length === 0) return null;
+  const safeIdx = idx % campaigns.length;
+  const current = campaigns[safeIdx];
 
   return (
     <section id="multilingual" className="bg-gray-950 overflow-hidden">
@@ -121,7 +124,7 @@ const MultilingualWork: React.FC = () => {
                 }}
                 className="absolute inset-0"
               >
-                <img src={current.src} alt={current.title} className="w-full h-full object-cover" />
+                <SmartImage src={current.src} alt={current.title} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
               </div>
 
@@ -142,7 +145,7 @@ const MultilingualWork: React.FC = () => {
               {/* Dots */}
               <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 flex gap-2">
                 {campaigns.map((_, i) => (
-                  <button key={i} onClick={() => { setDirection('right'); setIdx(i); }} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === idx ? 'bg-green-400 scale-125' : 'bg-white/30'}`} />
+                  <button key={i} onClick={() => { setDirection('right'); setIdx(i); }} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === safeIdx ? 'bg-green-400 scale-125' : 'bg-white/30'}`} />
                 ))}
               </div>
             </div>
@@ -176,7 +179,7 @@ const MultilingualWork: React.FC = () => {
 
         <div className={`text-center mt-14 transition-all duration-1000 delay-500 ${bottom.visible ? 'opacity-100' : 'opacity-0'}`}>
           <button
-            onClick={() => document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => navigate('portfolio')}
             className="border border-green-500/40 text-green-400 hover:bg-green-500 hover:text-black px-10 py-4 rounded-full font-light text-sm tracking-widest uppercase transition-all duration-500 hover:scale-105"
           >
             View More Work
