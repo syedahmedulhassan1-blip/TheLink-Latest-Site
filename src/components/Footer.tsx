@@ -67,7 +67,7 @@ const Footer: React.FC = () => {
                 <div className="font-light text-sm space-y-1">
                   <div>South Asia: +92 304 223 9907</div>
                   <div>Middle East: +971 50 726 4698</div>
-                  <div className="text-gray-600 text-xs">Saudi Arabia: Expanding Soon</div>
+                  <div>Saudi Arabia: +966 53 641 5176</div>
                 </div>
               </div>
               <div className="flex items-center gap-3 text-gray-500">
