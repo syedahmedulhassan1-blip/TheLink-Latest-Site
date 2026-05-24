@@ -44,7 +44,17 @@ export interface SiteContent {
   showreel: {
     videos: MediaItem[];   // empty = section hides the video player gracefully
   };
+  multilingual: {
+    slides: MultilingualSlide[];
+  };
   portfolio: PortfolioCampaign[];
+}
+
+export interface MultilingualSlide {
+  src: string;
+  lang: string;
+  title: string;
+  market: string;
 }
 
 export const defaultContent: SiteContent = {
@@ -72,6 +82,13 @@ export const defaultContent: SiteContent = {
       src: '/image.png',
       alt: 'Syed Ahmed Ul Hassan, CEO and Global Tech and Creative Head',
     },
+  },
+  multilingual: {
+    slides: [
+      { src: '/russian.png', lang: 'Russian', title: 'Electric Launch Campaign', market: 'Russia' },
+      { src: '/Gemini_Generated_Image_ixm98sixm98sixm9 copy copy copy.png', lang: 'German', title: 'Emirates Comfort Campaign', market: 'Germany' },
+      { src: '/Toyota Brakes Arabic copy copy copy copy.png', lang: 'Arabic', title: 'Toyota Brake Pads Campaign', market: 'Saudi Arabia' },
+    ],
   },
   showreel: {
     videos: [
