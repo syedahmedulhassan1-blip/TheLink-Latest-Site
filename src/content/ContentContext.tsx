@@ -39,8 +39,20 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
 
       if (data?.data) {
-        // Merge so newly-added code fields still appear over an older stored row.
-        setContent({ ...defaultContent, ...(data.data as SiteContent) });
+        // Merge stored content over defaults, section by section, so a row that
+        // predates a newly-added section (e.g. multilingual) still gets that
+        // section from defaults instead of it being missing entirely.
+        const stored = data.data as Partial<SiteContent>;
+        setContent({
+          version: stored.version ?? defaultContent.version,
+          branding: stored.branding ?? defaultContent.branding,
+          hero: stored.hero ?? defaultContent.hero,
+          slideshow: stored.slideshow ?? defaultContent.slideshow,
+          about: stored.about ?? defaultContent.about,
+          showreel: stored.showreel ?? defaultContent.showreel,
+          multilingual: stored.multilingual ?? defaultContent.multilingual,
+          portfolio: stored.portfolio ?? defaultContent.portfolio,
+        });
       } else {
         await supabase.from(CONTENT_TABLE).upsert({ id: CONTENT_ROW_ID, data: defaultContent });
         setContent(defaultContent);
