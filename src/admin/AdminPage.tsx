@@ -3,10 +3,9 @@ import { Helmet } from 'react-helmet-async';
 import { Save, Plus, ArrowUp, ArrowDown, Trash2, LogOut, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useContent } from '../content/ContentContext';
 import { defaultContent, type SiteContent, type PortfolioCampaign } from '../content/defaultContent';
+import { verifyAdminPassword } from '../lib/supabase';
 import MediaField from './MediaField';
 
-// Simple client-side gate. Set VITE_ADMIN_PASSWORD in your .env.
-const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD as string) || 'thelink-admin';
 const AUTH_KEY = 'tl_admin_authed';
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
@@ -21,11 +20,22 @@ const AdminPage: React.FC = () => {
   const [draft, setDraft] = useState<SiteContent>(content);
   const [authed, setAuthed] = useState(false);
   const [pw, setPw] = useState('');
+  const [checking, setChecking] = useState(false);
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [errMsg, setErrMsg] = useState('');
 
   useEffect(() => { setAuthed(sessionStorage.getItem(AUTH_KEY) === '1'); }, []);
   useEffect(() => { if (!loading) setDraft(content); }, [loading, content]);
+
+  const attemptLogin = async () => {
+    if (checking) return;
+    setChecking(true);
+    setErrMsg('');
+    const ok = await verifyAdminPassword(pw);
+    setChecking(false);
+    if (ok) { sessionStorage.setItem(AUTH_KEY, '1'); setAuthed(true); }
+    else setErrMsg('Wrong password');
+  };
 
   const update = (fn: (d: SiteContent) => SiteContent) => setDraft((d) => fn(structuredClone(d)));
 
@@ -45,14 +55,15 @@ const AdminPage: React.FC = () => {
           <p className="text-sm text-gray-500 mb-6">Enter the password to manage site media.</p>
           <input
             type="password" value={pw} onChange={(e) => setPw(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && pw === ADMIN_PASSWORD) { sessionStorage.setItem(AUTH_KEY, '1'); setAuthed(true); } }}
+            onKeyDown={(e) => { if (e.key === 'Enter') void attemptLogin(); }}
             placeholder="Password"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-3 focus:outline-none focus:border-emerald-400"
           />
           <button
-            onClick={() => { if (pw === ADMIN_PASSWORD) { sessionStorage.setItem(AUTH_KEY, '1'); setAuthed(true); } else setErrMsg('Wrong password'); }}
-            className="w-full py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >Enter</button>
+            onClick={() => void attemptLogin()}
+            disabled={checking}
+            className="w-full py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
+          >{checking ? <><Loader2 className="w-4 h-4 animate-spin" /> Checking…</> : 'Enter'}</button>
           {errMsg && <p className="text-xs text-red-600 mt-3">{errMsg}</p>}
         </div>
       </div>
