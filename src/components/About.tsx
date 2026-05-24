@@ -54,6 +54,21 @@ const About: React.FC = () => {
           </p>
         </div>
 
+        {/* Full-bleed image above the "10 Years" area. Breaks out to full
+            viewport width. White fade top/bottom to blend with the page.
+            Hidden until set in the CMS. */}
+        {content.about.fullBleedImage?.src ? (
+          <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen mb-24">
+            <SmartImage
+              src={content.about.fullBleedImage.src}
+              alt={content.about.fullBleedImage.alt || ''}
+              variant="light"
+              className="w-full h-auto block"
+            />
+            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.5) 0%, transparent 14%, transparent 86%, rgba(255,255,255,0.5) 100%)' }} />
+          </div>
+        ) : null}
+
         {/* Two-col */}
         <div
           ref={grid.ref}
