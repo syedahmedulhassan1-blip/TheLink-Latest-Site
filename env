@@ -1,0 +1,7 @@
+# Supabase — required for the /admin CMS to save & upload live.
+# Get these from your Supabase project: Settings → API.
+VITE_SUPABASE_URL=https://wxkdjuduskrlzhvadbwp.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4a2RqdWR1c2tybHpodmFkYndwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MjU1MDEsImV4cCI6MjA5NTIwMTUwMX0.jjC_E4j1OL5w7X4r9KIIrfMQY99D87L5BBBRLkXfU-U
+
+# Password to access /admin. Change this to something only you know.
+VITE_ADMIN_PASSWORD=Mamaraura8!
