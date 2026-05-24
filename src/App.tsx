@@ -40,23 +40,29 @@ function SiteShell() {
       <ScrollToTop />
       <Header />
       <div className="flex-1">
-        <main className="pt-[72px] md:pt-[88px]">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/portfolio" element={<PortfolioPage />} />
-            <Route path="/agentic-ai" element={<AgenticAIPage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/rent-creative" element={<RentCreativePage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            {/* Unknown URLs fall back to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
+        <Routes>
+          {/* Home: hero sits flush at top, transparent header floats over it */}
+          <Route path="/" element={<HomePage />} />
+          {/* Other pages: offset so content clears the fixed header */}
+          <Route path="/about" element={<OffsetPage><AboutPage /></OffsetPage>} />
+          <Route path="/portfolio" element={<OffsetPage><PortfolioPage /></OffsetPage>} />
+          <Route path="/agentic-ai" element={<OffsetPage><AgenticAIPage /></OffsetPage>} />
+          <Route path="/services" element={<OffsetPage><ServicesPage /></OffsetPage>} />
+          <Route path="/rent-creative" element={<OffsetPage><RentCreativePage /></OffsetPage>} />
+          <Route path="/contact" element={<OffsetPage><ContactPage /></OffsetPage>} />
+          {/* Unknown URLs fall back to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </div>
       <Footer />
     </div>
   );
 }
+
+// Pushes page content below the fixed header (used on all pages except home,
+// where the hero intentionally sits under the transparent header).
+const OffsetPage: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="pt-[72px] md:pt-[80px]">{children}</div>
+);
 
 export default App;
