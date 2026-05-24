@@ -29,7 +29,9 @@ const AdminPage: React.FC = () => {
     if (!loading) {
       setDraft({
         ...content,
+        about: { ...defaultContent.about, ...content.about },
         multilingual: content.multilingual ?? defaultContent.multilingual,
+        agenticAI: content.agenticAI ?? defaultContent.agenticAI,
       });
     }
   }, [loading, content]);
@@ -134,8 +136,13 @@ const AdminPage: React.FC = () => {
           </button>
         </Section>
 
-        <Section title="About — CEO Photo">
+        <Section title="About Page">
           <MediaField label="CEO portrait" value={draft.about.ceoPhoto.src} onChange={(v) => update((d) => { d.about.ceoPhoto.src = v; return d; })} />
+          <MediaField
+            label="Full-bleed image (above “10 Years…”, leave empty to hide)"
+            value={draft.about.fullBleedImage?.src ?? ''}
+            onChange={(v) => update((d) => { if (!d.about.fullBleedImage) d.about.fullBleedImage = { src: '', alt: '' }; d.about.fullBleedImage.src = v; return d; })}
+          />
         </Section>
 
         <Section title="Showreel Videos">
@@ -169,6 +176,14 @@ const AdminPage: React.FC = () => {
           <button onClick={() => update((d) => { if (!d.multilingual) d.multilingual = { slides: [] }; d.multilingual.slides.push({ src: '', lang: '', title: '', market: '' }); return d; })} className="inline-flex items-center gap-1.5 text-sm text-emerald-700 hover:text-emerald-600">
             <Plus className="w-4 h-4" /> Add slide
           </button>
+        </Section>
+
+        <Section title="Agentic AI — Full-bleed Image (under “Under The Hood”)">
+          <MediaField
+            label="Full-bleed image (leave empty to hide)"
+            value={draft.agenticAI?.underHoodImage?.src ?? ''}
+            onChange={(v) => update((d) => { if (!d.agenticAI) d.agenticAI = { underHoodImage: { src: '', alt: '' } }; d.agenticAI.underHoodImage.src = v; return d; })}
+          />
         </Section>
 
         <Section title="Portfolio Campaigns">
