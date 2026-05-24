@@ -25,7 +25,14 @@ const AdminPage: React.FC = () => {
   const [errMsg, setErrMsg] = useState('');
 
   useEffect(() => { setAuthed(sessionStorage.getItem(AUTH_KEY) === '1'); }, []);
-  useEffect(() => { if (!loading) setDraft(content); }, [loading, content]);
+  useEffect(() => {
+    if (!loading) {
+      setDraft({
+        ...content,
+        multilingual: content.multilingual ?? defaultContent.multilingual,
+      });
+    }
+  }, [loading, content]);
 
   const attemptLogin = async () => {
     if (checking) return;
@@ -141,6 +148,26 @@ const AdminPage: React.FC = () => {
           ))}
           <button onClick={() => update((d) => { d.showreel.videos.push({ src: '', alt: '' }); return d; })} className="inline-flex items-center gap-1.5 text-sm text-emerald-700 hover:text-emerald-600">
             <Plus className="w-4 h-4" /> Add video
+          </button>
+        </Section>
+
+        <Section title="Multilingual Slides (Services page)">
+          {(draft.multilingual?.slides ?? []).map((s, i) => (
+            <div key={i} className="border border-gray-200 rounded-lg p-3 bg-white space-y-2">
+              <MediaField
+                value={s.src}
+                onChange={(v) => update((d) => { d.multilingual.slides[i].src = v; return d; })}
+                onRemove={() => update((d) => { d.multilingual.slides.splice(i, 1); return d; })}
+              />
+              <div className="grid grid-cols-3 gap-2">
+                <input value={s.lang} placeholder="Language" onChange={(e) => update((d) => { d.multilingual.slides[i].lang = e.target.value; return d; })} className="px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-emerald-400" />
+                <input value={s.title} placeholder="Campaign title" onChange={(e) => update((d) => { d.multilingual.slides[i].title = e.target.value; return d; })} className="px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-emerald-400" />
+                <input value={s.market} placeholder="Market" onChange={(e) => update((d) => { d.multilingual.slides[i].market = e.target.value; return d; })} className="px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-emerald-400" />
+              </div>
+            </div>
+          ))}
+          <button onClick={() => update((d) => { if (!d.multilingual) d.multilingual = { slides: [] }; d.multilingual.slides.push({ src: '', lang: '', title: '', market: '' }); return d; })} className="inline-flex items-center gap-1.5 text-sm text-emerald-700 hover:text-emerald-600">
+            <Plus className="w-4 h-4" /> Add slide
           </button>
         </Section>
 
