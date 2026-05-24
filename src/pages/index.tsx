@@ -7,6 +7,7 @@ import Portfolio from '../components/Portfolio';
 import AgenticAI from '../components/AgenticAI';
 import Services from '../components/Services';
 import Websites from '../components/Websites';
+import MultilingualWork from '../components/MultilingualWork';
 import RentACreative from '../components/RentACreative';
 import Contact from '../components/Contact';
 
@@ -44,6 +45,7 @@ export const ServicesPage: React.FC = () => (
   <>
     <Seo page="services" />
     <Services />
+    <MultilingualWork />
     <Websites />
   </>
 );
