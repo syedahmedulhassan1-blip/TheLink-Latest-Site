@@ -40,12 +40,16 @@ export interface SiteContent {
   };
   about: {
     ceoPhoto: MediaItem;
+    fullBleedImage: MediaItem;
   };
   showreel: {
     videos: MediaItem[];   // empty = section hides the video player gracefully
   };
   multilingual: {
     slides: MultilingualSlide[];
+  };
+  agenticAI: {
+    underHoodImage: MediaItem;
   };
   portfolio: PortfolioCampaign[];
 }
@@ -82,6 +86,8 @@ export const defaultContent: SiteContent = {
       src: '/image.png',
       alt: 'Syed Ahmed Ul Hassan, CEO and Global Tech and Creative Head',
     },
+    // Full-bleed image above the "10 Years..." area. Empty = hidden.
+    fullBleedImage: { src: '', alt: 'The Link' },
   },
   multilingual: {
     slides: [
@@ -89,6 +95,10 @@ export const defaultContent: SiteContent = {
       { src: '/Gemini_Generated_Image_ixm98sixm98sixm9 copy copy copy.png', lang: 'German', title: 'Emirates Comfort Campaign', market: 'Germany' },
       { src: '/Toyota Brakes Arabic copy copy copy copy.png', lang: 'Arabic', title: 'Toyota Brake Pads Campaign', market: 'Saudi Arabia' },
     ],
+  },
+  agenticAI: {
+    // Full-bleed image shown under the "Under The Hood" card. Empty = hidden.
+    underHoodImage: { src: '', alt: 'Agentic AI in action' },
   },
   showreel: {
     videos: [
