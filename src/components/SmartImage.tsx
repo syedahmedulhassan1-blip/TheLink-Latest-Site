@@ -40,6 +40,8 @@ const SmartImage: React.FC<SmartImageProps> = ({
     <img
       src={src}
       alt={alt}
+      loading="lazy"
+      decoding="async"
       onError={() => setFailed(true)}
       className={className}
       style={style}
