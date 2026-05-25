@@ -5,6 +5,7 @@ import {
   getSupabase, isSupabaseConfigured, CONTENT_TABLE, CONTENT_ROW_ID, STORAGE_BUCKET,
 } from '../lib/supabase';
 import { defaultContent, type SiteContent } from './defaultContent';
+import { compressImage } from '../lib/compressImage';
 
 interface ContentCtx {
   content: SiteContent;
@@ -81,11 +82,13 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
   const uploadFile: ContentCtx['uploadFile'] = useCallback(async (file) => {
     const supabase = await getSupabase();
     if (!supabase) return { error: 'Supabase not configured.' };
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    // Auto-resize/compress images before upload so the site stays fast.
+    const optimized = await compressImage(file);
+    const safeName = optimized.name.replace(/[^a-zA-Z0-9._-]/g, '_');
     const path = `${Date.now()}-${safeName}`;
     const { error } = await supabase.storage
       .from(STORAGE_BUCKET)
-      .upload(path, file, { cacheControl: '3600', upsert: false });
+      .upload(path, optimized, { cacheControl: '31536000', upsert: false });
     if (error) return { error: error.message };
     const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
     return { url: data.publicUrl };
