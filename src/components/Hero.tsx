@@ -46,6 +46,8 @@ const Hero: React.FC = () => {
         <SmartImage
           src={content.hero.image.src}
           alt={content.hero.image.alt || 'The Link Advertising'}
+          loading="eager"
+          fetchPriority="high"
           className="w-full h-auto block animate-zoom-pan"
           style={{
             maxHeight: '100vh',
