@@ -75,15 +75,25 @@ const Lightbox: React.FC<LightboxProps> = ({ item, onClose }) => {
 
         {/* Image area */}
         <div className="relative bg-gray-950 rounded-2xl overflow-hidden flex items-center justify-center" style={{ minHeight: '60vh' }}>
-          {item.images.map((img, i) => (
-            <SmartImage
-              key={i}
-              src={img}
-              alt={`${item.title} ${i + 1}`}
-              className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ${i === idx ? 'opacity-100' : 'opacity-0'}`}
-              style={{ maxHeight: '65vh' }}
-            />
-          ))}
+          {item.images.map((img, i) => {
+            // Only mount the current image and its immediate neighbours. This
+            // means opening a 14-image gallery loads ~3 images, not 14, and the
+            // next/prev are already warm for instant navigation.
+            const near = Math.abs(i - idx) <= 1
+              || (idx === 0 && i === item.images.length - 1)
+              || (idx === item.images.length - 1 && i === 0);
+            if (!near) return null;
+            return (
+              <SmartImage
+                key={i}
+                src={img}
+                alt={`${item.title} ${i + 1}`}
+                loading={i === idx ? 'eager' : 'lazy'}
+                className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ${i === idx ? 'opacity-100' : 'opacity-0'}`}
+                style={{ maxHeight: '65vh' }}
+              />
+            );
+          })}
 
           {/* Nav arrows */}
           {item.images.length > 1 && (
@@ -150,14 +160,10 @@ const Lightbox: React.FC<LightboxProps> = ({ item, onClose }) => {
 
 // ── Card ─────────────────────────────────────────────────
 const PortfolioCard: React.FC<{ item: PortfolioItem; delay: number; visible: boolean; onOpen: () => void }> = ({ item, delay, visible, onOpen }) => {
-  const [imgIdx, setImgIdx] = useState(0);
   const [hovered, setHovered] = useState(false);
-
-  useEffect(() => {
-    if (item.images.length <= 1) return;
-    const iv = setInterval(() => setImgIdx(p => (p + 1) % item.images.length), 3500);
-    return () => clearInterval(iv);
-  }, [item.images.length]);
+  // Cards load ONLY the cover image (index 0). The rest of the gallery loads
+  // only when the lightbox is opened. This is the fastest possible grid.
+  const cover = item.images[0];
 
   const catColors: Record<string, string> = {
     creative: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
@@ -175,20 +181,14 @@ const PortfolioCard: React.FC<{ item: PortfolioItem; delay: number; visible: boo
         hover:border-white/15 transition-all duration-700
         ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
     >
-      {/* Image */}
+      {/* Image — single cover only */}
       <div className="relative overflow-hidden aspect-[4/5]">
-        {item.images.map((img, i) => (
-          <div
-            key={i}
-            className={`absolute inset-0 transition-opacity duration-1000 ${i === imgIdx ? 'opacity-100' : 'opacity-0'}`}
-          >
-            <SmartImage
-              src={img}
-              alt={`${item.title} ${i + 1}`}
-              className={`w-full h-full object-cover transition-transform duration-[1.2s] ${hovered ? 'scale-105' : 'scale-100'}`}
-            />
-          </div>
-        ))}
+        <SmartImage
+          src={cover}
+          alt={item.title}
+          loading="lazy"
+          className={`w-full h-full object-cover transition-transform duration-[1.2s] ${hovered ? 'scale-105' : 'scale-100'}`}
+        />
 
         {/* Hover overlay */}
         <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity duration-300 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
